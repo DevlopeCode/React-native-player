@@ -28,6 +28,15 @@ const {height, width} = Dimensions.get('window');
 const setupPLayer = async () => {
   console.log('sdhfjksdhfjsdhfs.........................');
   await TrackPlayer.setupPlayer();
+  await TrackPlayer.updateOptions({
+    capabilities: [
+      Capability.Play,
+      Capability.Pause,
+      Capability.SkipToNext,
+      Capability.SkipToPrevious,
+      Capability.Stop,
+    ],
+  });
   await TrackPlayer.add(Songs);
 };
 
@@ -39,7 +48,7 @@ const togglePlayback = async playbackState => {
     console.log('State.Paused=>>>>>>>>', State.Ready);
     console.log('playbackState=>>>>>>>>', playbackState);
 
-    if (playbackState === State.Paused) {
+    if (playbackState === State.Ready) {
       await TrackPlayer.play();
     } else {
       await TrackPlayer.pause();
@@ -54,6 +63,18 @@ const Player = () => {
   const [songIndex, setsongIndex] = useState(0);
   const [repeteMode, setrepeteMode] = useState('off');
   const songSlider = useRef(null);
+  const [trackArtwork, settrackArtwork] = useState();
+  const [trackArtist, settrackArtist] = useState();
+  const [trackTitle, settrackTitle] = useState();
+
+  useTrackPlayerEvents([Event.PlaybackTrackChanged], async event => {
+    if (event.type == Event.PlaybackTrackChanged && event.nextTrack != null) {
+      const track = await TrackPlayer.getTrack(event.nextTrack);
+      const {title, Image, artist} = track;
+      settrackTitle(title), settrackArtist(artist), settrackArtwork(Image);
+    }
+  });
+
   useEffect(() => {
     setupPLayer();
     scrollX.addListener(({value}) => {
@@ -121,7 +142,7 @@ const Player = () => {
           alignItems: 'center',
         }}>
         <View style={styles.artworkWrapper}>
-          <Image source={item.Image} style={styles.artworkimage} />
+          <Image source={trackArtwork} style={styles.artworkimage} />
         </View>
       </Animated.View>
     );
@@ -155,8 +176,8 @@ const Player = () => {
           />
         </View>
         <View>
-          <Text style={styles.title}>{Songs[songIndex].title}</Text>
-          <Text style={styles.artist}>{Songs[songIndex].artist}</Text>
+          <Text style={styles.title}>{trackTitle}</Text>
+          <Text style={styles.artist}>{trackArtist}</Text>
         </View>
         <View>
           <Slider
