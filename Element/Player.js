@@ -10,6 +10,7 @@ import {
   Animated,
 } from 'react-native';
 import React, {useState, useEffect, useRef} from 'react';
+
 import TrackPlayer, {
   Capability,
   Event,
@@ -29,7 +30,15 @@ const setupPLayer = async () => {
   console.log('sdhfjksdhfjsdhfs.........................');
   await TrackPlayer.setupPlayer();
   await TrackPlayer.updateOptions({
+    stopWithApp:true,
     capabilities: [
+      Capability.Play,
+      Capability.Pause,
+      Capability.SkipToNext,
+      Capability.SkipToPrevious,
+      Capability.Stop,
+    ],
+    compactCapabilities: [
       Capability.Play,
       Capability.Pause,
       Capability.SkipToNext,
@@ -43,10 +52,10 @@ const setupPLayer = async () => {
 const togglePlayback = async playbackState => {
   const currentTrack = await TrackPlayer.getCurrentTrack();
 
-  console.log('setup=>>>>>>>>', currentTrack);
+  // console.log('setup=>>>>>>>>', currentTrack);
   if (currentTrack !== null) {
-    console.log('State.Paused=>>>>>>>>', State.Ready);
-    console.log('playbackState=>>>>>>>>', playbackState);
+    // console.log('State.Paused=>>>>>>>>', State.Ready);
+    // console.log('playbackState=>>>>>>>>', playbackState);
 
     if (playbackState === State.Ready) {
       await TrackPlayer.play();
@@ -78,8 +87,8 @@ const Player = () => {
   useEffect(() => {
     setupPLayer();
     scrollX.addListener(({value}) => {
-      console.log('scroll X', scrollX);
-      console.log('width', width);
+      // console.log('scroll X', scrollX);
+      // console.log('width', width);
       const index = Math.round(value / width);
       skipTo(index);
       setsongIndex(index);
@@ -91,7 +100,7 @@ const Player = () => {
   }, []);
 
   const repeatIcon = () => {
-    console.log('repeteMode.............', repeteMode);
+    // console.log('repeteMode.............', repeteMode);
     if (repeteMode == 'off') {
       return 'repeat-on';
     }
